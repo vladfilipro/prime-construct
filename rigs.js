@@ -46,8 +46,8 @@ module.exports = {
         'compile': {
             taskname: 'rig-javascript__browserify',
             dependency: [ 'lint-jscs', 'lint-jshint' ],
-            src: './src/pce.js',
-            output: 'pce.js',
+            src: './src/pc.js',
+            output: 'pc.js',
             sourcemap: true,
             dest: './build',
             debug: true,

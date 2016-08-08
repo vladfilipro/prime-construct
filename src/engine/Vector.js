@@ -2,21 +2,35 @@
 
 var Point = require( './Point' );
 
-function Vector( origin, destination ) {
-    this.originPoint = origin;
-    this.destinationPoint = destination;
+function Vector( originPoint, destinationPoint ) {
+    this.origin = originPoint || new Point();
+    this.destination = destinationPoint || new Point();
 
-    if ( ( this.originPoint instanceof Point ) && ( this.destinationPoint instanceof Point ) ) {
+    if ( !( ( this.origin instanceof Point ) && ( this.destination instanceof Point ) ) ) {
         throw 'Vector requires an instance of Point';
     }
 
 }
 
-Point.prototype.getDistance = function () {
+Vector.prototype.distance = function () {
     return Math.sqrt(
-        ( this.destinationPoint.x - this.originPoint.x ) ^ 2 +
-        ( this.destinationPoint.y - this.originPoint.y ) ^ 2
+        Math.pow( ( this.destination.x - this.origin.x ), 2 ) +
+        Math.pow( ( this.destination.y - this.origin.y ), 2 )
     );
+};
+
+Vector.prototype.translate = function ( destination ) {
+    this.destination.x += destination.x - this.origin.x;
+    this.destination.y += destination.y - this.origin.y;
+    this.origin = destination;
+    return this;
+};
+
+Vector.prototype.breakdown = function () {
+    return {
+        x: this.destination.x - this.origin.x,
+        y: this.destination.y - this.origin.y
+    };
 };
 
 module.exports = Vector;

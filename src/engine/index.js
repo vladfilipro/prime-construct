@@ -1,5 +1,8 @@
 'use strict';
 
-module.exports = function () {
-
+module.exports = {
+    Engine: require( './Engine' ),
+    Body: require( './Body' ),
+    Point: require( './Point' ),
+    Vector: require( './Vector' )
 };
