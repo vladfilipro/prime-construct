@@ -1,0 +1,29 @@
+{
+    "name": "prime-construct",
+    "version": "1.0.0",
+    "description": "Prime Construct Engine",
+    "author": "Vlad Filip ( vlad.filip.dev@gmail.com )",
+    "license": "UNLICENSED",
+    "main": "./src/engine.js",
+    "keywords": [
+        "node"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://gitlab.com/vladfilipro/prime-construct.git"
+    },
+    "bugs": {
+        "url": "https://gitlab.com/vladfilipro/prime-construct/issues"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "rigs": "*",
+        "rig-javascript": "*",
+        "run-sequence": "1.2.2",
+        "browser-sync": "2.14.0"
+    },
+    "scripts": {
+        "start": "npm outdated && ./node_modules/.bin/rigs && ./node_modules/.bin/gulp init",
+        "test": "./node_modules/.bin/gulp test"
+    }
+}
