@@ -8,4 +8,15 @@ function Point( x, y ) {
         throw 'Point requires X,Y constructor arguments to be numbers';
     }
 }
+
+Point.prototype.set = function ( point ) {
+    this.x = point.x;
+    this.y = point.y;
+    return this;
+};
+
+Point.prototype.clone = function () {
+    return new Point( this.x, this.y );
+};
+
 module.exports = Point;

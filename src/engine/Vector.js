@@ -9,7 +9,6 @@ function Vector( originPoint, destinationPoint ) {
     if ( !( ( this.origin instanceof Point ) && ( this.destination instanceof Point ) ) ) {
         throw 'Vector requires an instance of Point';
     }
-
 }
 
 Vector.prototype.distance = function () {
@@ -26,11 +25,12 @@ Vector.prototype.translate = function ( destination ) {
     return this;
 };
 
-Vector.prototype.breakdown = function () {
-    return {
-        x: this.destination.x - this.origin.x,
-        y: this.destination.y - this.origin.y
-    };
+Vector.prototype.getLengthX = function () {
+    return this.destination.x - this.origin.x;
+};
+
+Vector.prototype.getLengthY = function () {
+    return this.destination.y - this.origin.y;
 };
 
 module.exports = Vector;
