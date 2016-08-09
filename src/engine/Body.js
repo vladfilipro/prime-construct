@@ -1,5 +1,7 @@
 'use strict';
 
+var utils = require( './../libs/utils' );
+
 var Point = require( './Point' );
 
 function Body( origin ) {
@@ -28,16 +30,18 @@ function Body( origin ) {
     this.durability = 1;
     this.mass = 1;
     this.area = 25;
-    this.friction = 0.1;
+    this.friction = 1;
 }
 
 Body.prototype.collideY = function () {
+    this.position.y = 400;
     this.velocity.y = 1 - this.velocity.y;
 };
 
 Body.prototype.updateAcceleration = function () {
-    this.acceleration.x += this.force.x / this.mass;
-    this.acceleration.y += this.force.y / this.mass;
+    var acceleration = utils.round( this.force.x / this.mass, 8 );
+    this.acceleration.x += acceleration - this.friction;
+    this.acceleration.y += acceleration - this.friction;
     this.force.x = 0;
     this.force.y = 0;
 };
@@ -56,6 +60,7 @@ Body.prototype.cycle = function () {
     this.updateAcceleration();
     this.updateVelocity();
     this.updateMovement();
+    console.log( this.velocity.x );
 
     // Handle friction
 };
