@@ -19,7 +19,7 @@ var getContext = function ( w, h ) {
             context.fillStyle = color;
             context.fill();
             context.lineWidth = 1;
-            context.strokeStyle = 'black';
+            context.strokeStyle = 'red';
             context.stroke();
         },
         rect: function ( x, y, w, h, color ) {
@@ -49,13 +49,15 @@ document.addEventListener( 'DOMContentLoaded', function () {
         for ( var i = 0, l = data.length; i < l; i++ ) {
             bodyPosition = data[ i ].position;
             ctx.dot( bodyPosition.x, bodyPosition.y, 'yellow' );
+            b1.applyForce( new PC.Vector( null, new PC.Point( 0, 0.8 ) ) );
+
             if ( bodyPosition.y >= 400 ) {
                 data[ i ].collideY();
             }
         }
     }, 32 );
 
-    b1.applyForce( new PC.Vector( null, new PC.Point( 1, 1 ) ) );
+    b1.applyForce( new PC.Vector( null, new PC.Point( 5, 0 ) ) );
 
     setTimeout( function () {
         console.log( 'The end.' );

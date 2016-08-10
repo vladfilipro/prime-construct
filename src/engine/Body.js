@@ -30,7 +30,7 @@ function Body( origin ) {
     this.durability = 1;
     this.mass = 1;
     this.area = 25;
-    this.friction = 1;
+    this.damping = 0.01;
 }
 
 Body.prototype.collideY = function () {
@@ -39,9 +39,8 @@ Body.prototype.collideY = function () {
 };
 
 Body.prototype.updateAcceleration = function () {
-    var acceleration = utils.round( this.force.x / this.mass, 8 );
-    this.acceleration.x += acceleration - this.friction;
-    this.acceleration.y += acceleration - this.friction;
+    this.acceleration.x = utils.round( this.force.x / this.mass, 6 ) - utils.round( ( this.velocity.x * this.damping ), 4 );
+    this.acceleration.y = utils.round( this.force.y / this.mass, 6 ) - utils.round( ( this.velocity.y * this.damping ), 4 );
     this.force.x = 0;
     this.force.y = 0;
 };
@@ -52,17 +51,14 @@ Body.prototype.updateVelocity = function () {
 };
 
 Body.prototype.updateMovement = function () {
-    this.position.x += this.velocity.x;
-    this.position.y += this.velocity.y;
+    this.position.x += utils.round( this.velocity.x, 2 );
+    this.position.y += utils.round( this.velocity.y, 2 );
 };
 
 Body.prototype.cycle = function () {
     this.updateAcceleration();
     this.updateVelocity();
     this.updateMovement();
-    console.log( this.velocity.x );
-
-    // Handle friction
 };
 
 // Not needed in 1 dimension body
