@@ -29,7 +29,7 @@ function Body( origin ) {
     this.velocity = {
         x: 0,
         y: 0,
-        rotate: 0
+        angle: 0
     };
 
     this.durability = 1;
@@ -41,7 +41,7 @@ function Body( origin ) {
 Body.prototype.updateAcceleration = function () {
     this.acceleration.x = utils.round( ( this.force.x - this.velocity.x * this.damping ) / this.mass, 4 );
     this.acceleration.y = utils.round( ( this.force.y - this.velocity.y * this.damping ) / this.mass, 4 );
-    this.acceleration.rotate = utils.round( ( this.torque - this.velocity.rotate * this.damping ) / this.mass, 4 );
+    this.acceleration.angle = utils.round( ( this.torque - this.velocity.angle * this.damping ) / this.mass, 4 );
     this.torque = 0;
     this.force.x = 0;
     this.force.y = 0;
@@ -50,14 +50,13 @@ Body.prototype.updateAcceleration = function () {
 Body.prototype.updateVelocity = function () {
     this.velocity.x += this.acceleration.x;
     this.velocity.y += this.acceleration.y;
-    this.velocity.rotate += this.acceleration.rotate;
+    this.velocity.angle += this.acceleration.angle;
 };
 
 Body.prototype.updateMovement = function () {
     this.position.x += utils.round( this.velocity.x, 2 );
     this.position.y += utils.round( this.velocity.y, 2 );
-    this.angle += utils.round( this.velocity.rotate, 2 );
-    console.log( this.angle );
+    this.angle += utils.round( this.velocity.angle, 2 );
 };
 
 Body.prototype.cycle = function () {
