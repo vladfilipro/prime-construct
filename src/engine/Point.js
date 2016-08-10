@@ -9,7 +9,7 @@ function Point( x, y ) {
     }
 }
 
-Point.prototype.set = function ( point ) {
+Point.prototype.translate = function ( point ) {
     this.x = point.x;
     this.y = point.y;
     return this;

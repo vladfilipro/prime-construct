@@ -18,13 +18,6 @@ Vector.prototype.distance = function () {
     );
 };
 
-Vector.prototype.translate = function ( destination ) {
-    this.destination.x += destination.x - this.origin.x;
-    this.destination.y += destination.y - this.origin.y;
-    this.origin = destination;
-    return this;
-};
-
 Vector.prototype.getLengthX = function () {
     return this.destination.x - this.origin.x;
 };

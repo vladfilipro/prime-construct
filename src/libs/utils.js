@@ -1,6 +1,9 @@
 'use strict';
 
 module.exports = {
+    uniqueId: function () {
+        return ( new Date() ).getTime() + '' + Math.floor( Math.random() * 10000000 );
+    },
     capitalize: function ( str ) {
         return str[ 0 ].toUpperCase() + str.substring( 1, str.length );
     },

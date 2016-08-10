@@ -13,9 +13,13 @@ var getContext = function ( w, h ) {
     context.fillStyle = 'rgba(40,40,40,1.0)';
     context.fillRect( 0, 0, canvas.width, canvas.height );
     return {
-        dot: function ( x, y, color ) {
+        dot: function ( x, y, a, color ) {
+            context.save();
+            context.translate( x + 10, y + 10 );
+            context.rotate( a );
             context.beginPath();
-            context.rect( x, y, 5, 5 );
+            context.rect( -10, -10, 20, 20 );
+            context.restore();
             context.fillStyle = color;
             context.fill();
             context.lineWidth = 1;
@@ -34,30 +38,24 @@ var getContext = function ( w, h ) {
 document.addEventListener( 'DOMContentLoaded', function () {
     var engine = new PC.Engine();
 
-    var b1 = new PC.Body( new PC.Point( 50, 200 ) );
-
     var ctx = getContext( 800, 600 );
     ctx.rect( 0, 400, 800, 1, 'red' );
 
-    engine.bodies.push( b1 );
+    var b1 = new PC.Body( new PC.Point( 50, 200 ) );
+
+    engine.addToWorld( b1 );
 
     engine.start();
 
     var renderer = setInterval( function () {
-        var data = engine.render();
-        var bodyPosition;
-        for ( var i = 0, l = data.length; i < l; i++ ) {
-            bodyPosition = data[ i ].position;
-            ctx.dot( bodyPosition.x, bodyPosition.y, 'yellow' );
-            b1.applyForce( new PC.Vector( null, new PC.Point( 0, 0.8 ) ) );
-
-            if ( bodyPosition.y >= 400 ) {
-                data[ i ].collideY();
-            }
+        var body;
+        for ( var i = 0, world = engine.world, bodies = Object.keys( world ), l = bodies.length; i < l; i++ ) {
+            body = world[ bodies[ i ] ];
+            ctx.dot( body.position.x, body.position.y, body.angle, 'yellow' );
         }
     }, 32 );
 
-    b1.applyForce( new PC.Vector( null, new PC.Point( 5, 0 ) ) );
+    b1.applyForce( new PC.Vector( new PC.Point( 49, 200 ), new PC.Point( 49, 201 ) ) );
 
     setTimeout( function () {
         console.log( 'The end.' );

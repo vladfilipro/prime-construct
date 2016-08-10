@@ -5,19 +5,17 @@ function Engine() {
     this.running = false;
     this.interval = 16;
 
-    this.bodies = [];
-
     this.world = {};
 }
 
-Engine.prototype.render = function () {
-    return this.bodies;
+Engine.prototype.cycle = function () {
+    for ( var i = 0, keys = Object.keys( this.world ), l = keys.length; i < l; i++ ) {
+        this.world[ keys[ i ] ].cycle();
+    }
 };
 
-Engine.prototype.cycle = function () {
-    for ( var i = 0; i < this.bodies.length; i++ ) {
-        this.bodies[ i ].cycle();
-    }
+Engine.prototype.addToWorld = function ( body ) {
+    this.world[ body.id ] = body;
 };
 
 Engine.prototype.start = function () {
