@@ -3,6 +3,7 @@
 var utils = require( './../libs/utils' );
 
 var Point = require( './Point' );
+var Vector = require( './Vector' );
 
 function Body( origin ) {
 
@@ -34,7 +35,7 @@ function Body( origin ) {
 
     this.durability = 1;
     this.mass = 1;
-    this.area = 1;
+    this.radius = 1;
     this.damping = 0.01;
 }
 
@@ -58,9 +59,9 @@ Body.prototype.updateVelocity = function () {
         this.velocity.angle += this.acceleration.angle;
 
         // Come to full stop when approching 0 speed
-        this.velocity.x = ( this.velocity.x < 1 && this.acceleration.x === 0 ) ? 0 : this.velocity.x;
-        this.velocity.y = ( this.velocity.y < 1 && this.acceleration.y === 0 ) ? 0 : this.velocity.y;
-        this.velocity.angle = ( this.velocity.angle < 0.001 && this.acceleration.angle === 0 ) ? 0 : this.velocity.angle;
+        this.velocity.x = ( this.velocity.x < 0.1 && this.acceleration.x === 0 ) ? 0 : this.velocity.x;
+        this.velocity.y = ( this.velocity.y < 0.1 && this.acceleration.y === 0 ) ? 0 : this.velocity.y;
+        this.velocity.angle = ( this.velocity.angle < 0.0001 && this.acceleration.angle === 0 ) ? 0 : this.velocity.angle;
     }
 };
 
@@ -88,6 +89,27 @@ Body.prototype.applyForce = function ( force ) {
         this.force.x = forceX;
         this.force.y = forceY;
     }
+};
+
+Body.prototype.collidedWith = function ( body ) {
+    if ( !( this.parent && body.parent && this.parent.id === body.parent.id ) ) {
+        var vector = new Vector( this.position, body.position );
+        var overlap = ( this.radius + body.radius ) - vector.distance();
+
+        if ( overlap > 0 ) {
+            console.log( this.position, body.position );
+
+            // TO BE REMOVED!
+            this.collided = true;
+            body.collided = true;
+
+            throw 'touch';
+
+            //return true;
+        }
+    }
+
+    return false;
 };
 
 module.exports = Body;

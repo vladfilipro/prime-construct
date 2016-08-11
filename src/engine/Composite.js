@@ -12,15 +12,15 @@ function Composite() {
     Body.call( this, new Point() );
 
     this.bodies = {};
+    delete this.radius;
 }
 
 Composite.prototype = Object.create( Body.prototype );
 Composite.prototype.constructor = Composite;
 
-// Updates object mass, area, durability and center of mass
+// Updates object mass, durability and center of mass
 Composite.prototype.update = function () {
     var mass = 0;
-    var area = 0;
     var durability = 0;
 
     var origin = new Point();
@@ -31,7 +31,6 @@ Composite.prototype.update = function () {
         origin.x += body.position.x * body.mass;
         origin.y += body.position.y * body.mass;
         mass += body.mass;
-        area += body.area;
         durability += body.durability;
     }
 
@@ -39,7 +38,6 @@ Composite.prototype.update = function () {
     origin.y = origin.y / mass;
 
     this.position = origin;
-    this.area = area;
     this.mass = mass;
     this.durability = durability;
 };
@@ -48,17 +46,19 @@ Composite.prototype.addBody = function ( body ) {
     body.parent = this;
     this.bodies[ body.id ] = body;
     this.update();
+    return this;
 };
 
 Composite.prototype.removeBody = function ( body ) {
     delete this.bodies[ body.id ];
     this.update();
+    return this;
 };
 
 Composite.prototype.translate = function ( destination ) {
-    var body;
 
     // Translate all bodies
+    var body;
     for ( var i = 0, bodies = Object.keys( this.bodies ), l = bodies.length; i < l; i++ ) {
         body = this.bodies[ bodies[ i ] ];
         body.position.x += destination.x - this.position.x;
@@ -66,6 +66,18 @@ Composite.prototype.translate = function ( destination ) {
     }
 
     this.position = destination.clone();
+};
+
+Composite.prototype.rotate = function ( angle ) {
+    this.angle = angle;
+
+    // Rotate all bodies
+    var body;
+    for ( var i = 0, bodies = Object.keys( this.bodies ), l = bodies.length; i < l; i++ ) {
+        body = this.bodies[ bodies[ i ] ];
+        body.angle += this.angle;
+        body.position.rotate( this.position, this.angle );
+    }
 };
 
 Composite.prototype.updateMovement = function () {

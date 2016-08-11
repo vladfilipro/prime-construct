@@ -26,4 +26,8 @@ Vector.prototype.getLengthY = function () {
     return this.destination.y - this.origin.y;
 };
 
+Vector.prototype.clone = function () {
+    return new Vector( this.origin.clone(), this.destination.clone() );
+};
+
 module.exports = Vector;

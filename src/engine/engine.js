@@ -1,22 +1,14 @@
 'use strict';
 
+var World = require( './World' );
+
 function Engine() {
 
     this.running = false;
     this.interval = 16;
 
-    this.world = {};
+    this.world = new World();
 }
-
-Engine.prototype.cycle = function () {
-    for ( var i = 0, keys = Object.keys( this.world ), l = keys.length; i < l; i++ ) {
-        this.world[ keys[ i ] ].cycle();
-    }
-};
-
-Engine.prototype.addToWorld = function ( body ) {
-    this.world[ body.id ] = body;
-};
 
 Engine.prototype.start = function () {
     var self = this;
@@ -24,7 +16,7 @@ Engine.prototype.start = function () {
 
     var loop = function () {
         setTimeout( function () {
-            self.cycle();
+            self.world.cycle();
             if ( self.running ) {
                 loop();
             }
