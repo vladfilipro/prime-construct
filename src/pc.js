@@ -41,26 +41,48 @@ document.addEventListener( 'DOMContentLoaded', function () {
     var ctx = getContext( 800, 600 );
     ctx.rect( 0, 400, 800, 1, 'red' );
 
-    var b1 = new PC.Body( new PC.Point( 50, 200 ) );
+    var ship = new PC.Composite();
 
-    engine.addToWorld( b1 );
+    ship.addBody( new PC.Body( new PC.Point( 0, 0 ) ) );
+    ship.addBody( new PC.Body( new PC.Point( 0, 20 ) ) );
+    ship.addBody( new PC.Body( new PC.Point( 0, 40 ) ) );
+    ship.addBody( new PC.Body( new PC.Point( 20, 40 ) ) );
+
+    ship.translate( new PC.Point( 100, 100 ) );
+
+    engine.addToWorld( ship );
 
     engine.start();
 
     var renderer = setInterval( function () {
+        var entity;
         var body;
         for ( var i = 0, world = engine.world, bodies = Object.keys( world ), l = bodies.length; i < l; i++ ) {
-            body = world[ bodies[ i ] ];
-            ctx.dot( body.position.x, body.position.y, body.angle, 'yellow' );
+            entity = world[ bodies[ i ] ];
+            for ( var j = 0, pieces = entity.bodies, ids = Object.keys( pieces ), jl = ids.length; j < jl; j++ ) {
+                body = pieces[ ids[ j ] ];
+                ctx.dot( body.position.x, body.position.y, body.angle, 'yellow' );
+            }
         }
     }, 32 );
 
-    b1.applyForce( new PC.Vector( new PC.Point( 49, 200 ), new PC.Point( 49, 201 ) ) );
+    ship.applyForce( new PC.Vector( new PC.Point( 101, 100 ), new PC.Point( 101, 100.1 ) ) );
+
+    setTimeout( function () {
+        console.log( 'Moving ship...' );
+        ship.translate( new PC.Point( 150, 150 ) );
+    }, 2000 );
+
+    setTimeout( function () {
+        console.log( 'Adding body part...' );
+        ship.addBody( new PC.Body( new PC.Point( 100, 100 ) ) );
+        ship.translate( new PC.Point( 150, 150 ) );
+    }, 2000 );
 
     setTimeout( function () {
         console.log( 'The end.' );
         engine.stop();
         clearInterval( renderer );
-    }, 10000 );
+    }, 12222 * 20000 );
 
 } );

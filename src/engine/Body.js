@@ -39,30 +39,45 @@ function Body( origin ) {
 }
 
 Body.prototype.updateAcceleration = function () {
-    this.acceleration.x = utils.round( ( this.force.x - this.velocity.x * this.damping ) / this.mass, 4 );
-    this.acceleration.y = utils.round( ( this.force.y - this.velocity.y * this.damping ) / this.mass, 4 );
-    this.acceleration.angle = utils.round( ( this.torque - this.velocity.angle * this.damping ) / this.mass, 4 );
-    this.torque = 0;
-    this.force.x = 0;
-    this.force.y = 0;
+    if ( !this.parent ) {
+        this.acceleration.x = utils.round( ( this.force.x - this.velocity.x * this.damping ) / this.mass, 4 );
+        this.acceleration.y = utils.round( ( this.force.y - this.velocity.y * this.damping ) / this.mass, 4 );
+
+        //( angle is a bit more sensitive )
+        this.acceleration.angle = utils.round( ( this.torque - this.velocity.angle * this.damping ) / this.mass, 6 );
+        this.torque = 0;
+        this.force.x = 0;
+        this.force.y = 0;
+    }
 };
 
 Body.prototype.updateVelocity = function () {
-    this.velocity.x += this.acceleration.x;
-    this.velocity.y += this.acceleration.y;
-    this.velocity.angle += this.acceleration.angle;
+    if ( !this.parent ) {
+        this.velocity.x += this.acceleration.x;
+        this.velocity.y += this.acceleration.y;
+        this.velocity.angle += this.acceleration.angle;
+
+        // Come to full stop when approching 0 speed
+        this.velocity.x = ( this.velocity.x < 1 && this.acceleration.x === 0 ) ? 0 : this.velocity.x;
+        this.velocity.y = ( this.velocity.y < 1 && this.acceleration.y === 0 ) ? 0 : this.velocity.y;
+        this.velocity.angle = ( this.velocity.angle < 0.001 && this.acceleration.angle === 0 ) ? 0 : this.velocity.angle;
+    }
 };
 
 Body.prototype.updateMovement = function () {
-    this.position.x += utils.round( this.velocity.x, 2 );
-    this.position.y += utils.round( this.velocity.y, 2 );
-    this.angle += utils.round( this.velocity.angle, 2 );
+    if ( !this.parent ) {
+        this.position.x += this.velocity.x;
+        this.position.y += this.velocity.y;
+        this.angle += this.velocity.angle;
+    }
 };
 
 Body.prototype.cycle = function () {
-    this.updateAcceleration();
-    this.updateVelocity();
-    this.updateMovement();
+    if ( !this.parent ) {
+        this.updateAcceleration();
+        this.updateVelocity();
+        this.updateMovement();
+    }
 };
 
 Body.prototype.applyForce = function ( force ) {
