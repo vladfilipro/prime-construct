@@ -50,6 +50,7 @@ Body.prototype.updateAcceleration = function () {
         this.force.x = 0;
         this.force.y = 0;
     }
+    return this;
 };
 
 Body.prototype.updateVelocity = function () {
@@ -63,6 +64,7 @@ Body.prototype.updateVelocity = function () {
         this.velocity.y = ( this.velocity.y < 0.1 && this.acceleration.y === 0 ) ? 0 : this.velocity.y;
         this.velocity.angle = ( this.velocity.angle < 0.0001 && this.acceleration.angle === 0 ) ? 0 : this.velocity.angle;
     }
+    return this;
 };
 
 Body.prototype.updateMovement = function () {
@@ -71,6 +73,7 @@ Body.prototype.updateMovement = function () {
         this.position.y += this.velocity.y;
         this.angle += this.velocity.angle;
     }
+    return this;
 };
 
 Body.prototype.cycle = function () {
@@ -79,6 +82,22 @@ Body.prototype.cycle = function () {
         this.updateVelocity();
         this.updateMovement();
     }
+    return this;
+};
+
+Body.prototype.translate = function ( destination ) {
+    this.position = destination;
+    return this;
+};
+
+Body.prototype.stop = function () {
+    this.velocity.x = 0;
+    this.velocity.y = 0;
+    this.velocity.rotate = 0;
+    this.acceleration.x = 0;
+    this.acceleration.y = 0;
+    this.acceleration.rotate = 0;
+    return this;
 };
 
 Body.prototype.applyForce = function ( force ) {
@@ -89,23 +108,31 @@ Body.prototype.applyForce = function ( force ) {
         this.force.x = forceX;
         this.force.y = forceY;
     }
+    return this;
 };
 
 Body.prototype.collidedWith = function ( body ) {
     if ( !( this.parent && body.parent && this.parent.id === body.parent.id ) ) {
         var vector = new Vector( this.position, body.position );
-        var overlap = ( this.radius + body.radius ) - vector.distance();
+        var distance = vector.distance();
+        var overlap = ( this.radius + body.radius ) - distance;
 
         if ( overlap > 0 ) {
-            console.log( this.position, body.position );
 
             // TO BE REMOVED!
             this.collided = true;
             body.collided = true;
 
-            throw 'touch';
+            var target = ( this.parent || this );
 
-            //return true;
+            var velocity = new Vector( this.position.clone(), new Point( this.position.x + this.velocity.x, this.position.y + this.velocity.y ) );
+            velocity
+                .rotate( Math.PI + 2 * vector.angle() - velocity.angle() );
+
+            //target.translate( new Point( 2 * target.position.x - this.position.x, 2 * target.position.y - this.position.y ) );
+            target.applyForce( velocity );
+
+            return true;
         }
     }
 

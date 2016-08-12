@@ -40,6 +40,7 @@ Composite.prototype.update = function () {
     this.position = origin;
     this.mass = mass;
     this.durability = durability;
+    return this;
 };
 
 Composite.prototype.addBody = function ( body ) {
@@ -65,7 +66,8 @@ Composite.prototype.translate = function ( destination ) {
         body.position.y += destination.y - this.position.y;
     }
 
-    this.position = destination.clone();
+    this.position = destination;
+    return this;
 };
 
 Composite.prototype.rotate = function ( angle ) {
@@ -78,6 +80,7 @@ Composite.prototype.rotate = function ( angle ) {
         body.angle += this.angle;
         body.position.rotate( this.position, this.angle );
     }
+    return this;
 };
 
 Composite.prototype.updateMovement = function () {
@@ -90,6 +93,7 @@ Composite.prototype.updateMovement = function () {
         body.angle = this.angle;
         body.position.rotate( this.position, this.velocity.angle );
     }
+    return this;
 };
 
 module.exports = Composite;
