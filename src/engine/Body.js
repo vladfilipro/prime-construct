@@ -6,10 +6,7 @@ var Vector = require( './Vector' );
 
 function Body( origin ) {
 
-    origin = origin || {
-        x: 0,
-        y: 0
-    };
+    origin = origin || Vector.create( 0, 0 );
 
     if ( !( ( typeof origin.x === 'number' ) && ( typeof origin.y === 'number' ) ) ) {
         throw 'Vector requires X,Y constructor arguments to be numbers';
@@ -52,6 +49,15 @@ Body.prototype.update = function () {
     this.angle += this.angularVelocity;
 
     // Manipulate bodies
+    var body;
+    for ( var i = 0, bodies = Object.keys( this.bodies ), l = bodies.length; i < l; i++ ) {
+        body = this.bodies[ bodies[ i ] ];
+        body.prevPosition = body.position;
+        body.position = Vector.create( body.position.x + this.velocity.x, body.position.y + this.velocity.y );
+        body.prevAngle = body.angle;
+        body.angle = body.angle + this.angularVelocity;
+    }
+
 };
 
 Body.prototype.setPosition = function ( point ) {
@@ -79,23 +85,24 @@ Body.prototype.applyForce = function ( force, origin ) {
     return this;
 };
 
-// Body.prototype.collidedWith = function ( body ) {
-//     if ( !( this.parent && body.parent && this.parent.id === body.parent.id ) ) {
-//         var vector = new Vector( this.position, body.position );
-//         var distance = vector.distance();
-//         var overlap = ( this.radius + body.radius ) - distance;
-//
-//         if ( overlap > 0 ) {
-//
-//             // TO BE REMOVED!
-//             this.collided = true;
-//             body.collided = true;
-//
-//             return true;
-//         }
-//     }
-//
-//     return false;
-// };
+Body.prototype.collidedWith = function () {
+
+    // if ( !( this.parent && body.parent && this.parent.id === body.parent.id ) ) {
+    //     var vector = new Vector( this.position, body.position );
+    //     var distance = vector.distance();
+    //     var overlap = ( this.radius + body.radius ) - distance;
+    //
+    //     if ( overlap > 0 ) {
+    //
+    //         // TO BE REMOVED!
+    //         this.collided = true;
+    //         body.collided = true;
+    //
+    //         return true;
+    //     }
+    // }
+    //
+    //return false;
+};
 
 module.exports = Body;

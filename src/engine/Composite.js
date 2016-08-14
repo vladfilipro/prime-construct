@@ -7,7 +7,7 @@ var Vector = require( './Vector' );
 function Composite() {
 
     // Constructor
-    Body.call( this, new Vector() );
+    Body.call( this );
 
     this.bodies = {};
     delete this.radius;
@@ -21,7 +21,7 @@ Composite.prototype.updateStructure = function () {
     var mass = 0;
     var durability = 0;
 
-    var origin = new Vector();
+    var origin = Vector.create();
 
     var body;
     for ( var i = 0, bodies = Object.keys( this.bodies ), l = bodies.length; i < l; i++ ) {
@@ -60,37 +60,23 @@ Composite.prototype.setPosition = function ( point ) {
     for ( var i = 0, bodies = Object.keys( this.bodies ), l = bodies.length; i < l; i++ ) {
         body = this.bodies[ bodies[ i ] ];
         body.position = Vector.add( body.position, diff );
-
-        // TO BE CONTINUED! From here to bot, fix vectors
-        body.prevPosition.add( diff.clone().invert() );
+        body.prevPosition = Vector.sub( body.position, body.velocity );
     }
-    this.prevPosition.add( diff );
+    this.prevPosition = Vector.add( this.prevPosition, diff );
     this.position = point;
     return this;
 };
 
 Composite.prototype.rotate = function ( angle ) {
     var body;
+    var diff = angle - this.angle;
     for ( var i = 0, bodies = Object.keys( this.bodies ), l = bodies.length; i < l; i++ ) {
         body = this.bodies[ bodies[ i ] ];
-        body.angle += angle - body.angle;
-        body.position.rotate( this.prevAngle + ( body.angle - angle ) );
+        body.angle += diff;
+        body.prevAngle = Vector.sub( body.angle, body.angularVelocity );
     }
-    this.prevAngle = angle;
+    this.prevAngle += diff;
     this.angle = angle;
-    return this;
-};
-
-Composite.prototype.updateMovement = function () {
-    Body.prototype.updateMovement.call( this );
-    var body;
-    for ( var i = 0, bodies = Object.keys( this.bodies ), l = bodies.length; i < l; i++ ) {
-        body = this.bodies[ bodies[ i ] ];
-        body.position.x += this.velocity.x;
-        body.position.y += this.velocity.y;
-        body.angle = this.angle;
-        body.position.rotate( this.position, this.velocity.angle );
-    }
     return this;
 };
 

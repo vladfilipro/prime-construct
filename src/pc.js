@@ -50,39 +50,42 @@ document.addEventListener( 'DOMContentLoaded', function () {
     var createShip = function ( x, y ) {
         var ship = new PC.Composite();
 
-        var b1 = new PC.Body( new PC.Point( 0, 0 ) );
+        var b1 = new PC.Body();
         b1.radius = 10;
         b1.mass = 10;
         ship.addBody( b1 );
-        var b2 = new PC.Body( new PC.Point( 0, 20 ) );
+        var b2 = new PC.Body( PC.Vector.create( 0, 20 ) );
         b2.radius = 10;
         b2.mass = 10;
         ship.addBody( b2 );
-        var b3 = new PC.Body( new PC.Point( 0, 40 ) );
+        var b3 = new PC.Body( PC.Vector.create( 0, 40 ) );
         b3.radius = 10;
         b3.mass = 10;
         ship.addBody( b3 );
-        var b4 = new PC.Body( new PC.Point( 20, 40 ) );
+        var b4 = new PC.Body( PC.Vector.create( 20, 40 ) );
         b4.radius = 10;
         b4.mass = 10;
         ship.addBody( b4 );
 
-        ship.translate( new PC.Point( x, y ) );
+        ship.setPosition( x, y );
 
         return ship;
     };
 
     var ship1 = createShip( 100, 100 );
-    var ship2 = createShip( 200, 200 );
-    var asteroid = new PC.Body( new PC.Point( 50, 50 ), 10 );
-    asteroid.radius = 10;
-    asteroid.mass = 10;
-    asteroid.id = 0;
+
+    //var ship2 = createShip( 200, 200 );
+    //var asteroid = new PC.Body( PC.Vector.create( 50, 50 ), 10 );
+
+    // asteroid.radius = 10;
+    // asteroid.mass = 10;
+    // asteroid.id = 0;
 
     engine.world
-        .add( ship1 )
-        .add( ship2 )
-        .add( asteroid );
+        .add( ship1 );
+
+    //    .add( ship2 )
+    //    .add( asteroid );
 
     engine.start();
 
@@ -94,6 +97,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
         var body;
         for ( var i = 0, elements = engine.world.elements, elementsNames = Object.keys( elements ), il = elementsNames.length; i < il; i++ ) {
             element = elements[ elementsNames[ i ] ];
+            console.log( element.bodies );
             if ( element instanceof PC.Composite ) {
                 for ( var j = 0, bodies = element.bodies, bodiesNames = Object.keys( bodies ), jl = bodiesNames.length; j < jl; j++ ) {
                     body = bodies[ bodiesNames[ j ] ];
@@ -106,13 +110,13 @@ document.addEventListener( 'DOMContentLoaded', function () {
     }, 32 );
 
     // just spin ship1
-    ship1.applyForce( new PC.Vector( new PC.Point( 99, 100 ), new PC.Point( 99, 105 ) ) );
+    ship1.applyForce( PC.Vector.create( 10, 10 ), PC.Vector.create( 100, 100 ) );
 
     // push ship2 into ship1
-    ship2.applyForce( new PC.Vector( new PC.Point( 200, 200 ), new PC.Point( 190, 190 ) ) );
+    //ship2.applyForce( PC.Vector.create( 190, 190 ), PC.Vector.create( 200, 200 ) );
 
     // push asteroid
-    asteroid.applyForce( new PC.Vector( new PC.Point( 50, 50 ), new PC.Point( 70, 70 ) ) );
+    //asteroid.applyForce( PC.Vector.create( 70, 70 ), PC.Vector.create( 50, 50 ) );
 
     setTimeout( function () {
         console.log( 'The end.' );
