@@ -1,73 +1,80 @@
 'use strict';
 
-var Point = require( './Point' );
+var create = function ( x, y ) {
+    x = x || 0;
+    y = y || 0;
 
-function Vector( originPoint, destinationPoint ) {
-    this.origin = originPoint || new Point();
-    this.destination = destinationPoint || new Point();
-
-    if ( !( ( this.origin instanceof Point ) && ( this.destination instanceof Point ) ) ) {
-        throw 'Vector requires an instance of Point';
+    if ( !( ( typeof x === 'number' ) && ( typeof y === 'number' ) ) ) {
+        throw 'Vector requires X,Y constructor arguments to be numbers';
     }
-}
 
-Vector.prototype.distance = function () {
-    return Math.sqrt(
-        Math.pow( ( this.destination.x - this.origin.x ), 2 ) +
-        Math.pow( ( this.destination.y - this.origin.y ), 2 )
-    );
+    return {
+        x: x,
+        y: y
+    };
 };
 
-Vector.prototype.angle = function () {
-    return Math.atan2( this.destination.y - this.origin.y, this.destination.x - this.origin.x );
+var translate = function ( vector, x, y ) {
+    return create( x, y );
 };
 
-Vector.prototype.rotate = function ( angle ) {
+var rotate = function ( vector, angle, center ) {
     var cos = Math.cos( angle ),
         sin = Math.sin( angle );
-    var x = this.destination.x - this.origin.x;
-    var y = this.destination.y - this.origin.y;
-    this.destination.x = this.origin.x + ( x * cos - y * sin );
-    this.destination.y = this.origin.y + ( x * sin + y * cos );
-    return this;
+    center = center || {
+        x: 0,
+        y: 0
+    };
+    var x = center.x + ( ( vector.x - center.x ) * cos - ( vector.y - center.y ) * sin );
+    var y = center.y + ( ( vector.x - center.x ) * sin + ( vector.y - center.y ) * cos );
+    return create( x, y );
 };
 
-Vector.prototype.translate = function ( point ) {
-    var x = this.destination.x - this.origin.x;
-    var y = this.destination.y - this.origin.y;
-    this.origin.x = point.x;
-    this.origin.y = point.y;
-    this.destination.x = point.x + x;
-    this.destination.y = point.y + y;
-    return this;
+var magnitude = function ( vector ) {
+    return Math.sqrt( ( vector.x * vector.x ) + ( vector.y * vector.y ) );
 };
 
-Vector.prototype.multiply = function ( value ) {
-    this.destination.x = this.origin.x + ( this.destination.x - this.origin.x ) * value;
-    this.destination.y = this.origin.y + ( this.destination.y - this.origin.y ) * value;
-    return this;
+var angle = function ( vector, vector2 ) {
+    return Math.atan2( vector2.y - vector.y, vector2.x - vector.x );
 };
 
-Vector.prototype.invert = function () {
-    var x = this.origin.x;
-    var y = this.origin.y;
-    this.origin.x = this.destination.x;
-    this.origin.y = this.destination.y;
-    this.destination.x = x;
-    this.destination.y = y;
-    return this;
+var add = function ( vector, vector2 ) {
+    return create( vector.x + vector2.x, vector.y + vector2.y );
 };
 
-Vector.prototype.getLengthX = function () {
-    return this.destination.x - this.origin.x;
+var sub = function ( vector, vector2 ) {
+    return create( vector.x - vector2.x, vector.y - vector2.y );
 };
 
-Vector.prototype.getLengthY = function () {
-    return this.destination.y - this.origin.y;
+var multiply = function ( vector, value ) {
+    return create( vector.x * value, vector.y * value );
 };
 
-Vector.prototype.clone = function () {
-    return new Vector( this.origin.clone(), this.destination.clone() );
+var divide = function ( vector, value ) {
+    return create( vector.x / value, vector.y / value );
 };
 
-module.exports = Vector;
+var perpendicular = function ( vector, invert ) {
+    invert = invert === true ? -1 : 1;
+    var x = invert * -vector.y;
+    var y = invert * vector.x;
+    return create( x, y );
+};
+
+var invert = function ( vector ) {
+    return create( -vector.x, -vector.y );
+};
+
+module.exports = {
+    create: create,
+    translate: translate,
+    rotate: rotate,
+    magnitude: magnitude,
+    angle: angle,
+    add: add,
+    sub: sub,
+    multiply: multiply,
+    divide: divide,
+    perpendicular: perpendicular,
+    invert: invert
+};
