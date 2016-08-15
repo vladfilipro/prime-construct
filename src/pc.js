@@ -1,123 +1,109 @@
 'use strict';
 
-var PC = require( './engine' );
+var PC = require( './game' );
 
 window.PC = window.PC || PC;
 
-var getContext = function ( w, h ) {
-    var canvas = document.createElement( 'canvas' );
-    document.body.appendChild( canvas );
-    var context = canvas.getContext( '2d' );
-    context.canvas.width = w;
-    context.canvas.height = h;
-    return {
-        clear: function () {
-            context.beginPath();
-            context.rect( 0, 0, w, h );
-            context.fillStyle = 'rgba(40,40,40,1.0)';
-            context.fill();
+var getShip = function ( blocks, ships ) {
+    var ship = ships.create();
 
-        },
-        dot: function ( x, y, r, a, color ) {
-            context.save();
-            context.translate( x, y );
-            context.rotate( a );
-            context.beginPath();
-            context.arc( 0, 0, r, 0, 1.5 * Math.PI );
-            context.fillStyle = color;
-            context.fill();
-            context.beginPath();
-            context.arc( 0, 0, 1, 0, 1.5 * Math.PI );
-            context.fillStyle = '#FF0000';
-            context.fill();
-            context.restore();
-        },
-        rect: function ( x, y, w, h, color ) {
-            context.beginPath();
-            context.rect( x, y, w, h );
-            context.fillStyle = color;
-            context.fill();
-        }
+    var block1 = blocks.create( 'hull' );
+    var block2 = blocks.create( 'thruster' );
+    var block3 = blocks.create( 'hull' );
+    var block4 = blocks.create( 'thruster' );
+    var block5 = blocks.create( 'hull' );
+    var block6 = blocks.create( 'thruster' );
+    var block7 = blocks.create( 'hull' );
+    var block8 = blocks.create( 'thruster' );
+    var block9 = blocks.create( 'hull' );
+
+    ( function () {
+        block1.setPosition( {
+            x: 0,
+            y: 0
+        } );
+        block2.setPosition( {
+            x: 20,
+            y: 0
+        } );
+        block2.rotate( Math.PI );
+        block3.setPosition( {
+            x: 40,
+            y: 0
+        } );
+        block4.setPosition( {
+            x: 60,
+            y: 0
+        } );
+        block4.rotate( Math.PI );
+        block5.setPosition( {
+            x: 80,
+            y: 0
+        } );
+        block6.setPosition( {
+            x: 20,
+            y: 20
+        } );
+        block7.setPosition( {
+            x: 40,
+            y: 20
+        } );
+        block8.setPosition( {
+            x: 60,
+            y: 20
+        } );
+        block9.setPosition( {
+            x: 40,
+            y: 40
+        } );
+        ship
+            .addBody( block6 )
+            .addBody( block7 )
+            .addBody( block8 )
+            .addBody( block1 )
+            .addBody( block2 )
+            .addBody( block3 )
+            .addBody( block4 )
+            .addBody( block5 )
+            .addBody( block9 );
+    } )();
+
+    var bindKeys = function () {
+        var keys = {};
+        document.onkeydown = function ( e ) {
+            keys[ e.code ] = true;
+        };
+        document.onkeyup = function ( e ) {
+            keys[ e.code ] = false;
+        };
+        setInterval( function () {
+            if ( keys.KeyW ) {
+                block2.on();
+                block4.on();
+            }
+            if ( keys.KeyD ) {
+                block6.on();
+            }
+            if ( keys.KeyA ) {
+                block8.on();
+            }
+        }, 100 );
     };
+    bindKeys();
+
+    return ship;
 };
 
 document.addEventListener( 'DOMContentLoaded', function () {
     var engine = new PC.Engine();
-    engine.interval = 16;
-
-    var ctx = getContext( 800, 600 );
-    ctx.clear();
-
-    var createShip = function ( x, y ) {
-        var ship = new PC.Composite();
-
-        var b1 = new PC.Body();
-        b1.radius = 10;
-        b1.mass = 10;
-        b1.area = 10;
-        ship.addBody( b1 );
-        var b2 = new PC.Body( PC.Vector.create( 0, 20 ) );
-        b2.radius = 10;
-        b2.mass = 10;
-        b2.area = 10;
-        ship.addBody( b2 );
-        var b3 = new PC.Body( PC.Vector.create( 0, 40 ) );
-        b3.radius = 10;
-        b3.mass = 10;
-        b3.area = 10;
-        ship.addBody( b3 );
-        var b4 = new PC.Body( PC.Vector.create( 20, 40 ) );
-        b4.radius = 10;
-        b4.mass = 10;
-        b4.area = 10;
-        ship.addBody( b4 );
-
-        ship.setPosition( PC.Vector.create( x, y ) );
-
-        return ship;
-    };
-
-    var ship1 = createShip( 300, 300 );
-    var asteroid = new PC.Body( PC.Vector.create( 50, 50 ) );
-    asteroid.radius = 10;
-    asteroid.mass = 5;
-    asteroid.id = 0;
-
-    engine.world
-        .add( ship1 )
-        .add( asteroid );
+    var CanvasRenderer = PC.renderer( 'canvas' );
+    var renderer = new CanvasRenderer( engine );
 
     engine.start();
 
-    var renderer = setInterval( function () {
-        ctx.clear();
-        ctx.rect( 0, 400, 800, 1, 'red' );
+    engine.world.add( getShip( PC.blocks, PC.ships ) );
 
-        var element;
-        var body;
-        for ( var i = 0, elements = engine.world.elements, elementsNames = Object.keys( elements ), il = elementsNames.length; i < il; i++ ) {
-            element = elements[ elementsNames[ i ] ];
-            if ( element instanceof PC.Composite ) {
-                for ( var j = 0, bodies = element.bodies, bodiesNames = Object.keys( bodies ), jl = bodiesNames.length; j < jl; j++ ) {
-                    body = bodies[ bodiesNames[ j ] ];
-                    ctx.dot( body.position.x, body.position.y, body.radius, body.angle, ( body.collided ) ? 'blue' : 'yellow' );
-                }
-            } else {
-                ctx.dot( element.position.x, element.position.y, element.radius, element.angle, ( element.collided ) ? 'blue' : 'yellow' );
-            }
-        }
-    }, 32 );
-
-    // just spin ship1
-    ship1.applyForce( PC.Vector.create( -30, -30 ), PC.Vector.create( 300, 290 ) );
-
-    // push asteroid
-    asteroid.applyForce( PC.Vector.create( 15, 15 ), PC.Vector.create( 50, 49 ) );
-
-    setTimeout( function () {
-        console.log( 'The end.' );
-        engine.stop();
-        clearInterval( renderer );
-    }, 12222 * 20000 );
+    renderer.init();
+    renderer.start();
 
 } );

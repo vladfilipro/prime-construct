@@ -4,16 +4,10 @@ var utils = require( './../libs/utils' );
 
 var Vector = require( './Vector' );
 
-function Body( origin ) {
+function Body() {
 
-    origin = origin || Vector.create( 0, 0 );
-
-    if ( !( ( typeof origin.x === 'number' ) && ( typeof origin.y === 'number' ) ) ) {
-        throw 'Vector requires X,Y constructor arguments to be numbers';
-    }
-
-    this.position = origin;
-    this.prevPosition = origin;
+    this.position = Vector.create();
+    this.prevPosition = Vector.create();
 
     this.id = utils.uniqueId();
     this.parent = null;
@@ -29,7 +23,6 @@ function Body( origin ) {
     this.angularVelocity = 0;
     this.angularAcceleration = 0;
 
-    this.durability = 1;
     this.mass = 1;
     this.area = 1;
     this.radius = 1;
@@ -79,6 +72,7 @@ Body.prototype.cycle = function () {
 };
 
 Body.prototype.applyForce = function ( force, origin ) {
+    origin = origin || this.position;
     this.force = Vector.add( this.force, force );
     var offset = Vector.sub( origin, this.position );
     this.torque = ( offset.x * force.y - offset.y * force.x ) / this.area;
@@ -106,6 +100,13 @@ Body.prototype.checkCollision = function ( body ) {
     }
 
     return false;
+};
+
+Body.prototype.on = function () {
+    console.log( 'Activated: ', this.id );
+};
+Body.prototype.off = function () {
+    console.log( 'Deactivated: ', this.id );
 };
 
 module.exports = Body;

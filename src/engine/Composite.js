@@ -1,5 +1,7 @@
 'use strict';
 
+var utils = require( './../libs/utils' );
+
 var Body = require( './Body' );
 var Vector = require( './Vector' );
 
@@ -24,15 +26,13 @@ Composite.prototype.updateStructure = function () {
 
     var origin = Vector.create();
 
-    var body;
-    for ( var i = 0, bodies = Object.keys( this.bodies ), l = bodies.length; i < l; i++ ) {
-        body = this.bodies[ bodies[ i ] ];
+    utils.forEach( this.bodies, function ( body ) {
         origin.x += body.position.x * body.mass;
         origin.y += body.position.y * body.mass;
         mass += body.mass;
         area += body.area;
         durability += body.durability;
-    }
+    } );
 
     origin.x = origin.x / mass;
     origin.y = origin.y / mass;
@@ -47,16 +47,16 @@ Composite.prototype.updateStructure = function () {
 Composite.prototype.update = function () {
     Body.prototype.update.call( this );
 
+    var self = this;
+
     // Manipulate bodies
-    var body;
-    for ( var i = 0, bodies = Object.keys( this.bodies ), l = bodies.length; i < l; i++ ) {
-        body = this.bodies[ bodies[ i ] ];
+    utils.forEach( this.bodies, function ( body ) {
         body.prevPosition = body.position;
-        body.position = Vector.add( body.position, this.velocity );
+        body.position = Vector.add( body.position, self.velocity );
         body.prevAngle = body.angle;
-        body.angle += this.angularVelocity;
-        body.position = Vector.rotate( body.position, this.angularVelocity, this.position );
-    }
+        body.angle += self.angularVelocity;
+        body.position = Vector.rotate( body.position, self.angularVelocity, self.position );
+    } );
 };
 
 Composite.prototype.addBody = function ( body ) {
@@ -73,26 +73,22 @@ Composite.prototype.removeBody = function ( body ) {
 };
 
 Composite.prototype.setPosition = function ( point ) {
-    var body;
     var diff = Vector.sub( point, this.position );
-    for ( var i = 0, bodies = Object.keys( this.bodies ), l = bodies.length; i < l; i++ ) {
-        body = this.bodies[ bodies[ i ] ];
+    utils.forEach( this.bodies, function ( body ) {
         body.position = Vector.add( body.position, diff );
         body.prevPosition = Vector.sub( body.position, body.velocity );
-    }
+    } );
     this.prevPosition = Vector.add( this.prevPosition, diff );
     this.position = point;
     return this;
 };
 
 Composite.prototype.rotate = function ( angle ) {
-    var body;
     var diff = angle - this.angle;
-    for ( var i = 0, bodies = Object.keys( this.bodies ), l = bodies.length; i < l; i++ ) {
-        body = this.bodies[ bodies[ i ] ];
+    utils.forEach( this.bodies, function ( body ) {
         body.angle += diff;
         body.prevAngle = Vector.sub( body.angle, body.angularVelocity );
-    }
+    } );
     this.prevAngle += diff;
     this.angle = angle;
     return this;

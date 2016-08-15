@@ -1,5 +1,7 @@
 'use strict';
 
+var utils = require( './../libs/utils' );
+
 function World() {
     var self = this;
 
@@ -18,15 +20,14 @@ function World() {
             } );
         };
 
-        var element;
-        for ( var i = 0, keys = Object.keys( self.elements ), l = keys.length; i < l; i++ ) {
-            element = self.elements[ keys[ i ] ];
+        utils.forEach( self.elements, function ( element ) {
             if ( element.bodies && Object.keys( element.bodies ).length > 0 ) {
                 addCompositeParts( element );
             } else {
                 bodies[ element.id ] = element;
             }
-        }
+        } );
+
     };
 
     this.add = function ( body ) {
@@ -53,9 +54,9 @@ function World() {
 }
 
 World.prototype.cycle = function () {
-    for ( var i = 0, keys = Object.keys( this.elements ), l = keys.length; i < l; i++ ) {
-        this.elements[ keys[ i ] ].cycle();
-    }
+    utils.forEach( this.elements, function ( element ) {
+        element.cycle();
+    } );
     this.checkCollisions();
 };
 
