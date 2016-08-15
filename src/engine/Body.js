@@ -20,44 +20,44 @@ function Body( origin ) {
 
     this.force = Vector.create();
     this.velocity = Vector.create();
+    this.acceleration = Vector.create();
 
-    this.torque = 0;
     this.angle = 0;
     this.prevAngle = 0;
 
+    this.torque = 0;
     this.angularVelocity = 0;
+    this.angularAcceleration = 0;
 
     this.durability = 1;
     this.mass = 1;
+    this.area = 1;
     this.radius = 1;
-    this.damping = 0.01;
+    this.damping = 0.1;
 }
 
 Body.prototype.update = function () {
-    var prevVelocityX = this.position.x - this.prevPosition.x;
-    var prevVelocityY = this.position.y - this.prevPosition.y;
+    this.acceleration.x = ( this.force.x - this.velocity.x * this.damping ) / this.mass;
+    this.acceleration.y = ( this.force.y - this.velocity.y * this.damping ) / this.mass;
+    this.angularAcceleration = ( this.torque - this.angularVelocity * this.damping ) / this.mass;
 
-    this.velocity.x = ( prevVelocityX * this.damping ) + ( this.force.x / this.mass );
-    this.velocity.y = ( prevVelocityY * this.damping ) + ( this.force.y / this.mass );
+    this.velocity = Vector.add( this.velocity, this.acceleration );
+    this.angularVelocity += this.angularAcceleration;
 
     this.prevPosition = this.position;
-    this.position = Vector.create( this.position.x + this.velocity.x, this.position.y + this.velocity.y );
-
-    this.angularVelocity = ( ( this.angle - this.prevAngle ) * this.damping ) + ( this.torque / this.mass );
+    this.position = Vector.add( this.position, this.velocity );
 
     this.prevAngle = this.angle;
     this.angle += this.angularVelocity;
 
-    // Manipulate bodies
-    var body;
-    for ( var i = 0, bodies = Object.keys( this.bodies ), l = bodies.length; i < l; i++ ) {
-        body = this.bodies[ bodies[ i ] ];
-        body.prevPosition = body.position;
-        body.position = Vector.create( body.position.x + this.velocity.x, body.position.y + this.velocity.y );
-        body.prevAngle = body.angle;
-        body.angle = body.angle + this.angularVelocity;
-    }
+    // Come to full stop when approching 0 speed
+    this.velocity.x = ( this.velocity.x < 0.01 && Math.abs( this.acceleration.x ) <= 0.001 ) ? 0 : this.velocity.x;
+    this.velocity.y = ( this.velocity.y < 0.01 && Math.abs( this.acceleration.y ) <= 0.001 ) ? 0 : this.velocity.y;
+    this.angularVelocity = ( this.angularVelocity < 0.0001 && Math.abs( this.angularAcceleration ) <= 0.00001 ) ? 0 : this.angularVelocity;
 
+    this.force.x = 0;
+    this.force.y = 0;
+    this.torque = 0;
 };
 
 Body.prototype.setPosition = function ( point ) {
@@ -81,28 +81,31 @@ Body.prototype.cycle = function () {
 Body.prototype.applyForce = function ( force, origin ) {
     this.force = Vector.add( this.force, force );
     var offset = Vector.sub( origin, this.position );
-    this.torque += offset.x * force.y - offset.y * force.x;
+    this.torque = ( offset.x * force.y - offset.y * force.x ) / this.area;
     return this;
 };
 
-Body.prototype.collidedWith = function () {
+Body.prototype.checkCollision = function ( body ) {
 
-    // if ( !( this.parent && body.parent && this.parent.id === body.parent.id ) ) {
-    //     var vector = new Vector( this.position, body.position );
-    //     var distance = vector.distance();
-    //     var overlap = ( this.radius + body.radius ) - distance;
-    //
-    //     if ( overlap > 0 ) {
-    //
-    //         // TO BE REMOVED!
-    //         this.collided = true;
-    //         body.collided = true;
-    //
-    //         return true;
-    //     }
-    // }
-    //
-    //return false;
+    if ( !( this.parent && body.parent && this.parent.id === body.parent.id ) ) {
+        var diff = Vector.sub( this.position, body.position );
+        var distance = Vector.magnitude( diff );
+        var overlap = distance - ( this.radius + body.radius );
+
+        if ( overlap < 0 ) {
+            var factor = overlap / distance * 0.5;
+
+            var body1 = this.parent || this;
+            var body2 = body.parent || body;
+
+            body1.applyForce( Vector.create( -diff.x * factor, -diff.y * factor ), this.position );
+            body2.applyForce( Vector.create( diff.x * factor, diff.y * factor ), body.position );
+
+            return true;
+        }
+    }
+
+    return false;
 };
 
 module.exports = Body;

@@ -19,6 +19,7 @@ Composite.prototype.constructor = Composite;
 // Updates object mass, durability and center of mass
 Composite.prototype.updateStructure = function () {
     var mass = 0;
+    var area = 0;
     var durability = 0;
 
     var origin = Vector.create();
@@ -29,6 +30,7 @@ Composite.prototype.updateStructure = function () {
         origin.x += body.position.x * body.mass;
         origin.y += body.position.y * body.mass;
         mass += body.mass;
+        area += body.area;
         durability += body.durability;
     }
 
@@ -37,8 +39,24 @@ Composite.prototype.updateStructure = function () {
 
     this.position = origin;
     this.mass = mass;
+    this.area = area;
     this.durability = durability;
     return this;
+};
+
+Composite.prototype.update = function () {
+    Body.prototype.update.call( this );
+
+    // Manipulate bodies
+    var body;
+    for ( var i = 0, bodies = Object.keys( this.bodies ), l = bodies.length; i < l; i++ ) {
+        body = this.bodies[ bodies[ i ] ];
+        body.prevPosition = body.position;
+        body.position = Vector.add( body.position, this.velocity );
+        body.prevAngle = body.angle;
+        body.angle += this.angularVelocity;
+        body.position = Vector.rotate( body.position, this.angularVelocity, this.position );
+    }
 };
 
 Composite.prototype.addBody = function ( body ) {

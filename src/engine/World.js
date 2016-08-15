@@ -46,7 +46,7 @@ function World() {
 
         for ( var i = 0; i < l; i++ ) {
             for ( var j = i + 1; j < l; j++ ) {
-                bodies[ keys[ i ] ].collidedWith( bodies[ keys[ j ] ] );
+                bodies[ keys[ i ] ].checkCollision( bodies[ keys[ j ] ] );
             }
         }
     };

@@ -18,15 +18,16 @@ var getContext = function ( w, h ) {
             context.fill();
 
         },
-        dot: function ( x, y, r, color ) {
+        dot: function ( x, y, r, a, color ) {
             context.save();
             context.translate( x, y );
+            context.rotate( a );
             context.beginPath();
-            context.arc( 0, 0, r, 0, 2 * Math.PI );
+            context.arc( 0, 0, r, 0, 1.5 * Math.PI );
             context.fillStyle = color;
             context.fill();
             context.beginPath();
-            context.arc( 0, 0, 1, 0, 2 * Math.PI );
+            context.arc( 0, 0, 1, 0, 1.5 * Math.PI );
             context.fillStyle = '#FF0000';
             context.fill();
             context.restore();
@@ -53,39 +54,38 @@ document.addEventListener( 'DOMContentLoaded', function () {
         var b1 = new PC.Body();
         b1.radius = 10;
         b1.mass = 10;
+        b1.area = 10;
         ship.addBody( b1 );
         var b2 = new PC.Body( PC.Vector.create( 0, 20 ) );
         b2.radius = 10;
         b2.mass = 10;
+        b2.area = 10;
         ship.addBody( b2 );
         var b3 = new PC.Body( PC.Vector.create( 0, 40 ) );
         b3.radius = 10;
         b3.mass = 10;
+        b3.area = 10;
         ship.addBody( b3 );
         var b4 = new PC.Body( PC.Vector.create( 20, 40 ) );
         b4.radius = 10;
         b4.mass = 10;
+        b4.area = 10;
         ship.addBody( b4 );
 
-        ship.setPosition( x, y );
+        ship.setPosition( PC.Vector.create( x, y ) );
 
         return ship;
     };
 
-    var ship1 = createShip( 100, 100 );
-
-    //var ship2 = createShip( 200, 200 );
-    //var asteroid = new PC.Body( PC.Vector.create( 50, 50 ), 10 );
-
-    // asteroid.radius = 10;
-    // asteroid.mass = 10;
-    // asteroid.id = 0;
+    var ship1 = createShip( 300, 300 );
+    var asteroid = new PC.Body( PC.Vector.create( 50, 50 ) );
+    asteroid.radius = 10;
+    asteroid.mass = 5;
+    asteroid.id = 0;
 
     engine.world
-        .add( ship1 );
-
-    //    .add( ship2 )
-    //    .add( asteroid );
+        .add( ship1 )
+        .add( asteroid );
 
     engine.start();
 
@@ -97,26 +97,22 @@ document.addEventListener( 'DOMContentLoaded', function () {
         var body;
         for ( var i = 0, elements = engine.world.elements, elementsNames = Object.keys( elements ), il = elementsNames.length; i < il; i++ ) {
             element = elements[ elementsNames[ i ] ];
-            console.log( element.bodies );
             if ( element instanceof PC.Composite ) {
                 for ( var j = 0, bodies = element.bodies, bodiesNames = Object.keys( bodies ), jl = bodiesNames.length; j < jl; j++ ) {
                     body = bodies[ bodiesNames[ j ] ];
-                    ctx.dot( body.position.x, body.position.y, body.radius, ( body.collided ) ? 'blue' : 'yellow' );
+                    ctx.dot( body.position.x, body.position.y, body.radius, body.angle, ( body.collided ) ? 'blue' : 'yellow' );
                 }
             } else {
-                ctx.dot( element.position.x, element.position.y, element.radius, ( element.collided ) ? 'blue' : 'yellow' );
+                ctx.dot( element.position.x, element.position.y, element.radius, element.angle, ( element.collided ) ? 'blue' : 'yellow' );
             }
         }
     }, 32 );
 
     // just spin ship1
-    ship1.applyForce( PC.Vector.create( 10, 10 ), PC.Vector.create( 100, 100 ) );
-
-    // push ship2 into ship1
-    //ship2.applyForce( PC.Vector.create( 190, 190 ), PC.Vector.create( 200, 200 ) );
+    ship1.applyForce( PC.Vector.create( -30, -30 ), PC.Vector.create( 300, 290 ) );
 
     // push asteroid
-    //asteroid.applyForce( PC.Vector.create( 70, 70 ), PC.Vector.create( 50, 50 ) );
+    asteroid.applyForce( PC.Vector.create( 15, 15 ), PC.Vector.create( 50, 49 ) );
 
     setTimeout( function () {
         console.log( 'The end.' );
