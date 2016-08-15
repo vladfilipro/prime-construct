@@ -1,20 +1,69 @@
 'use strict';
 
+var COLORS = {
+    'thruster': '#FFFF00',
+    'hull': '#00FF00'
+};
+
 module.exports = function ( ctx, body ) {
-    var config = {
-        x: body.position.x || 0,
-        y: body.position.y || 0,
-        angle: body.angle || 0,
-        radius: body.radius || 0,
-        color: ( body.type === 'thruster' ) ? '#FF0000' : '#00FF00'
-    };
 
     ctx.save();
-    ctx.translate( config.x, config.y );
-    ctx.rotate( config.angle );
-    ctx.beginPath();
-    ctx.arc( 0, 0, config.radius, -Math.PI * 1 / 4, Math.PI + Math.PI * 1 / 4 );
-    ctx.fillStyle = config.color;
-    ctx.fill();
+    ctx.translate( body.position.x, body.position.y );
+    ctx.rotate( body.angle );
+
+    // Draw body
+    ( function () {
+        ctx.beginPath();
+        ctx.arc( 0, 0, body.radius, 1 / 6 * Math.PI, -1 / 6 * Math.PI );
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = ( body.type ) ? COLORS[ body.type ] : '#FFFF00';
+        ctx.stroke();
+    } )();
+
+    // Draw center
+    ( function () {
+        ctx.beginPath();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#FF0000';
+        ctx.moveTo( -2, -2 );
+        ctx.lineTo( 2, 2 );
+        ctx.moveTo( -2, 2 );
+        ctx.lineTo( 2, -2 );
+        ctx.stroke();
+    } )();
+
     ctx.restore();
+
+    ctx.save();
+    ctx.translate( body.position.x, body.position.y );
+
+    // Draw velocity
+    ( function () {
+        ctx.beginPath();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#FF9999';
+        ctx.moveTo( 0, 0 );
+        ctx.lineTo( body.force.x, body.force.y );
+        ctx.stroke();
+    } )();
+
+    ctx.restore();
+
+    if ( !body.parent ) {
+        ctx.save();
+        ctx.translate( body.position.x, body.position.y );
+
+        // Draw velocity
+        ( function () {
+            ctx.beginPath();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.moveTo( 0, 0 );
+            ctx.lineTo( body.velocity.x * 100, body.velocity.y * 100 );
+            ctx.stroke();
+        } )();
+
+        ctx.restore();
+    }
+
 };

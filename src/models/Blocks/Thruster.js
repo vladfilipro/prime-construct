@@ -11,7 +11,7 @@ function BlockThruster() {
     this.type = 'thruster';
 
     this.durability = 50;
-    this.thrust = Vector.create( 0, 1 );
+    this.thrust = 10;
 
 }
 
@@ -19,9 +19,10 @@ BlockThruster.prototype = Object.create( Block.prototype );
 BlockThruster.prototype.constructor = BlockThruster;
 
 BlockThruster.prototype.on = function () {
+    this.active = true;
     var target = this.parent || this;
-    console.log( Vector.rotate( this.thrust, this.angle ) );
-    target.applyForce( Vector.rotate( this.thrust, this.angle ), this.position );
+    var force = Vector.rotate( Vector.create( this.thrust, 0 ), this.angle );
+    target.applyForce( force, this.position );
 };
 
 module.exports = BlockThruster;

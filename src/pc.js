@@ -26,7 +26,7 @@ var getShip = function ( blocks, ships ) {
             x: 20,
             y: 0
         } );
-        block2.rotate( Math.PI );
+        block2.rotate( Math.PI / 2 );
         block3.setPosition( {
             x: 40,
             y: 0
@@ -35,7 +35,7 @@ var getShip = function ( blocks, ships ) {
             x: 60,
             y: 0
         } );
-        block4.rotate( Math.PI );
+        block4.rotate( Math.PI / 2 );
         block5.setPosition( {
             x: 80,
             y: 0
@@ -44,6 +44,7 @@ var getShip = function ( blocks, ships ) {
             x: 20,
             y: 20
         } );
+        block6.rotate( Math.PI );
         block7.setPosition( {
             x: 40,
             y: 20
@@ -52,6 +53,7 @@ var getShip = function ( blocks, ships ) {
             x: 60,
             y: 20
         } );
+        block8.rotate( 0 );
         block9.setPosition( {
             x: 40,
             y: 40
@@ -94,6 +96,23 @@ var getShip = function ( blocks, ships ) {
     return ship;
 };
 
+var asteroid = function ( blocks ) {
+    var block = blocks.create( 'hull' );
+
+    var getRandom = function ( min, max ) {
+        min = Math.ceil( min );
+        max = Math.floor( max );
+        return Math.floor( Math.random() * ( max - min + 1 ) ) + min;
+    };
+
+    block.setPosition( {
+        x: Math.floor( getRandom( 0, 1000 ) ),
+        y: Math.floor( getRandom( 0, 1000 ) )
+    } );
+
+    return block;
+};
+
 document.addEventListener( 'DOMContentLoaded', function () {
     var engine = new PC.Engine();
     var CanvasRenderer = PC.renderer( 'canvas' );
@@ -101,7 +120,17 @@ document.addEventListener( 'DOMContentLoaded', function () {
 
     engine.start();
 
-    engine.world.add( getShip( PC.blocks, PC.ships ) );
+    var ship = getShip( PC.blocks, PC.ships );
+    ship.setPosition( {
+        x: 200,
+        y: 200
+    } );
+
+    for ( var i = 0; i < 100; i++ ) {
+        engine.world.add( asteroid( PC.blocks ) );
+    }
+
+    engine.world.add( ship );
 
     renderer.init();
     renderer.start();

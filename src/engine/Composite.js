@@ -52,7 +52,9 @@ Composite.prototype.update = function () {
     // Manipulate bodies
     utils.forEach( this.bodies, function ( body ) {
         body.prevPosition = body.position;
+        body.velocity = self.velocity;
         body.position = Vector.add( body.position, self.velocity );
+        body.angle = body.angle % ( 2 * Math.PI ); // Prevent exceeding of numeric limit
         body.prevAngle = body.angle;
         body.angle += self.angularVelocity;
         body.position = Vector.rotate( body.position, self.angularVelocity, self.position );

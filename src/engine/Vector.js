@@ -35,7 +35,11 @@ var magnitude = function ( vector ) {
 };
 
 var angle = function ( vector, vector2 ) {
-    return Math.atan2( vector2.y - vector.y, vector2.x - vector.x );
+    vector2 = vector2 || {
+        x: 0,
+        y: 0
+    };
+    return Math.atan2( vector.y - vector2.y, vector.x - vector2.x );
 };
 
 var add = function ( vector, vector2 ) {

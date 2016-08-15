@@ -24,6 +24,7 @@ Canvas.prototype.renderScene = function () {
             utils.forEach( element.bodies, function ( body ) {
                 bodyRenderer( self.ctx, body );
             } );
+            bodyRenderer( self.ctx, element );
         } else {
             bodyRenderer( self.ctx, element );
         }
