@@ -11,6 +11,7 @@ function BlockThruster() {
     this.type = 'thruster';
 
     this.durability = 50;
+    this.mass = 200;
     this.thrust = 10;
 
 }
