@@ -12,23 +12,58 @@ function Canvas( engine ) {
     this.interval = 16;
     this.engine = engine;
 
+    this.renderers = {
+        background: null,
+        body: null
+    };
+
+    this.camera = {
+        x: 0,
+        y: 0,
+        attachedTo: null
+    };
+
     this.running = false;
 
 }
 
+Canvas.prototype.cameraMove = function ( x, y ) {
+    this.camera.x = x;
+    this.camera.y = y;
+};
+
+Canvas.prototype.cameraAttachTo = function ( body ) {
+    this.camera.attachedTo = body;
+};
+
 Canvas.prototype.renderScene = function () {
     var self = this;
-    backgroundRenderer( self.ctx );
-    utils.forEach( this.engine.world.elements, function ( element ) {
+
+    // Resize to fit screen
+    self.resize();
+
+    // Position camera to attached body , if exists in the world
+    if ( self.camera.attachedTo && self.engine.world.elements[ self.camera.attachedTo.id ] ) {
+        self.cameraMove( self.camera.attachedTo.position.x - self.ctx.canvas.width / 2, self.camera.attachedTo.position.y - self.ctx.canvas.height / 2 );
+    }
+
+    // Render background
+    self.renderers.background();
+    utils.forEach( self.engine.world.elements, function ( element ) {
         if ( element.bodies ) {
             utils.forEach( element.bodies, function ( body ) {
-                bodyRenderer( self.ctx, body );
+                self.renderers.body( body );
             } );
-            bodyRenderer( self.ctx, element );
+            self.renderers.body( element );
         } else {
-            bodyRenderer( self.ctx, element );
+            self.renderers.body( element );
         }
     } );
+};
+
+Canvas.prototype.resize = function () {
+    this.ctx.canvas.width = this.canvas.clientWidth;
+    this.ctx.canvas.height = this.canvas.clientHeight;
 };
 
 Canvas.prototype.init = function ( parent ) {
@@ -40,12 +75,15 @@ Canvas.prototype.init = function ( parent ) {
     canvas.style.height = '100%';
 
     var ctx = canvas.getContext( '2d' );
-    ctx.canvas.width = canvas.clientWidth;
-    ctx.canvas.height = canvas.clientHeight;
 
     this.parent = parent;
     this.canvas = canvas;
     this.ctx = ctx;
+
+    this.renderers.background = backgroundRenderer( ctx );
+    this.renderers.body = bodyRenderer( ctx, this.camera );
+
+    this.resize();
 };
 
 Canvas.prototype.start = function () {

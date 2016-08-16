@@ -58,6 +58,7 @@ Composite.prototype.update = function () {
         body.prevAngle = body.angle;
         body.angle += self.angularVelocity;
         body.position = Vector.rotate( body.position, self.angularVelocity, self.position );
+        body.sleeping = self.sleeping;
     } );
 };
 

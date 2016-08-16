@@ -55,7 +55,9 @@ function World() {
 
 World.prototype.cycle = function () {
     utils.forEach( this.elements, function ( element ) {
-        element.cycle();
+        if ( !element.sleeping ) {
+            element.cycle();
+        }
     } );
     this.checkCollisions();
 };

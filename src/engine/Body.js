@@ -27,7 +27,13 @@ function Body() {
     this.area = 1;
     this.radius = 1;
     this.damping = 0.005;
+
+    this.sleeping = true;
 }
+
+var approxZero = function ( value, margin ) {
+    return Math.abs( value ) <= margin;
+};
 
 Body.prototype.update = function () {
     this.acceleration.x = ( this.force.x / this.mass ) - ( this.velocity.x * this.damping );
@@ -50,6 +56,13 @@ Body.prototype.update = function () {
     this.force.x = 0;
     this.force.y = 0;
     this.torque = 0;
+
+    if ( approxZero( Vector.magnitude( this.velocity ), 0.0001 ) && approxZero( Vector.magnitude( this.acceleration ), 0.00001 ) &&
+        approxZero( this.angularVelocity, 0.0001 ) && approxZero( this.angularAcceleration, 0.00001 ) ) {
+
+        // Bring body to a full stop
+        this.sleeping = true;
+    }
 };
 
 Body.prototype.setPosition = function ( point ) {
@@ -75,6 +88,7 @@ Body.prototype.applyForce = function ( force, origin ) {
     this.force = Vector.add( this.force, force );
     var offset = Vector.sub( origin, this.position );
     this.torque += ( offset.x * force.y - offset.y * force.x ) / ( this.area * 10 );
+    this.sleeping = false;
     return this;
 };
 
@@ -86,13 +100,13 @@ Body.prototype.checkCollision = function ( body ) {
         var overlap = distance - ( this.radius + body.radius );
 
         if ( overlap < 0 ) {
-            var factor = overlap / distance * 0.25;
+            var factor = overlap / distance * 0.5;
 
             var body1 = this.parent || this;
             var body2 = body.parent || body;
 
-            body1.applyForce( Vector.multiply( Vector.invert( diff ), factor * body2.mass ), this.position );
-            body2.applyForce( Vector.multiply( diff, factor * body1.mass ), body.position );
+            body1.applyForce( Vector.multiply( Vector.invert( diff ), factor * body2.mass / body1.mass ), this.position );
+            body2.applyForce( Vector.multiply( diff, factor * body1.mass / body2.mass ), body.position );
 
             return true;
         }

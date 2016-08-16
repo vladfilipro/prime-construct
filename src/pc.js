@@ -27,6 +27,7 @@ var getShip = function ( blocks, ships ) {
             y: 0
         } );
         block2.rotate( Math.PI / 2 );
+        block2.thrust = 50;
         block3.setPosition( {
             x: 40,
             y: 0
@@ -36,6 +37,7 @@ var getShip = function ( blocks, ships ) {
             y: 0
         } );
         block4.rotate( Math.PI / 2 );
+        block4.thrust = 50;
         block5.setPosition( {
             x: 80,
             y: 0
@@ -133,6 +135,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
     engine.world.add( ship );
 
     renderer.init();
+    renderer.cameraAttachTo( ship );
     renderer.start();
 
 } );
