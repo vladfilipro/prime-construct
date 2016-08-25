@@ -4,7 +4,7 @@
     "description": "Prime Construct Engine",
     "author": "Vlad Filip ( vlad.filip.dev@gmail.com )",
     "license": "UNLICENSED",
-    "main": "./src/engine.js",
+    "main": "./src/game/index.js",
     "keywords": [
         "node"
     ],
